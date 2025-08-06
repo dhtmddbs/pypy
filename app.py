@@ -6,13 +6,14 @@ import seaborn as sns
 import matplotlib.font_manager as fm
 import os
 
-# ✅ 한글 폰트 설정 (NanumGothic.ttf를 프로젝트에 직접 포함했을 경우)
-font_path = "fonts/NanumGothic.ttf"  # 상대경로로 지정
+# ✅ 한글 폰트 설정
+font_path = "fonts/NanumGothic.ttf"
 if os.path.exists(font_path):
     font_name = fm.FontProperties(fname=font_path).get_name()
     plt.rcParams['font.family'] = font_name
 else:
-    st.warning("⚠️ NanumGothic.ttf 폰트 파일이 'fonts/' 폴더에 존재하지 않습니다.")
+    st.warning("⚠️ 'fonts/NanumGothic.ttf' 파일이 없습니다. 한글이 깨질 수 있어요.")
+
 plt.rcParams['axes.unicode_minus'] = False
 
 # ✅ Streamlit 설정
@@ -46,8 +47,7 @@ if uploaded_file:
     numeric_cols = df.select_dtypes(include=np.number).columns
 
     if len(numeric_cols) == 0:
-        st.info("ℹ️ 이 파일에는 분석 가능한 센서 수치 데이터가 없습니다.\n\n"
-                "예: 온도, 습도, 진동 등 숫자형 센서 데이터가 포함된 CSV를 업로드하면 다양한 분석 기능을 제공합니다.")
+        st.info("ℹ️ 분석 가능한 숫자형 센서 데이터가 없습니다.")
         st.stop()
 
     timestamp_available = False
