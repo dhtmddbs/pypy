@@ -3,27 +3,24 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
-import matplotlib.font_manager as fm
-import os
+from matplotlib import font_manager
 
-# ✅ 한글 폰트 설정
+# ✅ 폰트 설정 (NanumGothic 직접 경로로 등록)
 font_path = "fonts/NanumGothic.ttf"
-if os.path.exists(font_path):
-    font_name = fm.FontProperties(fname=font_path).get_name()
-    plt.rcParams['font.family'] = font_name
-else:
-    st.warning("⚠️ 'fonts/NanumGothic.ttf' 파일이 없습니다. 한글이 깨질 수 있어요.")
-
+font_manager.fontManager.addfont(font_path)
+plt.rcParams['font.family'] = font_manager.FontProperties(fname=font_path).get_name()
 plt.rcParams['axes.unicode_minus'] = False
 
-# ✅ Streamlit 설정
+# ✅ 페이지 설정
 st.set_page_config(page_title="스마트 팩토리 센서 분석기", layout="wide")
 st.title("📊 스마트 팩토리 센서 데이터 분석기")
 st.markdown("센서 데이터를 업로드하고 이상치를 감지하거나 시각화할 수 있습니다.")
 
+# ✅ CSV 업로드
 uploaded_file = st.file_uploader("📁 CSV 센서 로그 또는 목록 파일 업로드", type=["csv"])
 
 if uploaded_file:
+    # 다양한 인코딩 시도
     encodings_to_try = ['utf-8', 'cp949', 'ISO-8859-1']
     df = None
     for enc in encodings_to_try:
@@ -47,14 +44,14 @@ if uploaded_file:
     numeric_cols = df.select_dtypes(include=np.number).columns
 
     if len(numeric_cols) == 0:
-        st.info("ℹ️ 분석 가능한 숫자형 센서 데이터가 없습니다.")
+        st.info("ℹ️ 숫자형 센서 데이터가 없습니다. 예: 온도, 습도, 진동 등 숫자형 데이터가 포함되어야 합니다.")
         st.stop()
 
+    # ✅ timestamp 처리
     timestamp_available = False
     if "timestamp" in df.columns:
         df['timestamp'] = pd.to_datetime(df['timestamp'], errors='coerce')
-        df = df.dropna(subset=['timestamp'])
-        df = df.sort_values("timestamp")
+        df = df.dropna(subset=['timestamp']).sort_values("timestamp")
         timestamp_available = True
 
     if timestamp_available:
